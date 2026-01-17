@@ -214,3 +214,23 @@ func TestMain(m *testing.M) {
   fmt.Println("Setelah unit test")
 }
 ```
+
+# Sub Test
+- Go-Lang mendukung fitur pembuatan function unit test di dalam function unit test.
+- Fitur ini memang sedikit aneh dan jarang sekali dimiliki di unit test bahasa pemrograman lain.
+- Untuk membuat sub test, kita bisa menggunakan function ```Run()```.
+
+## Kode Program Membuat Sub Test
+```go
+func TestSubTest(t *testing.T) {
+  t.Run("Sandy", func(t *testing.T) {
+    result := HelloWorld("Sandy")
+    require.Equal(t, "Hello Sandy", result)
+  })
+
+  t.Run("Dwi", func(t *testing.T) {
+    result := HelloWorld("Dwi")
+    require.Equal(t, "Hello Dwi", result)
+  })
+}
+```
