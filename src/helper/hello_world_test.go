@@ -1,10 +1,10 @@
-package main
+package helper
 
 import "testing"
 
 func TestHelloWorld(t *testing.T) {
-	result := HelloWorld("Sandy")
+	result := HelloWorld("Dwi")
 	if result != "Hello Sandy" {
-		panic("Result is not Hello Sandy")
+		t.Fail()
 	}
 }
