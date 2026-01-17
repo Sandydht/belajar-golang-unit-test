@@ -168,3 +168,26 @@ func TestHelloWorldRequire(t *testing.T) {
   fmt.Println("Dieksekusi")
 }
 ```
+
+# Skip Test
+- Kadang dalam keadaan tertentu, kita ingin membatalkan eksekusi unit test.
+- Di Go-Lang kita juga bisa membatalkan eksekusi unit test.
+- Untuk membatalkan unit test kita bisa menggunakan function ```Skip()```.
+
+## Kode Program Skip Test
+```go
+import (
+  "fmt"
+  "github.com/stretchr/testify/require"
+  "testing"
+)
+
+func TestHelloWorldSkip(t *testing.T) {
+  if runtime.GOOS == "darwin" {
+    t.Skip("Unit test tidak bisa jalan di Mac")
+  }
+
+  result := HelloWorld("Sandy")
+  require.Equal(t, "Hello Sandy", result)
+}
+```
