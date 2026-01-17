@@ -254,12 +254,17 @@ func TestHelloWorldTable(t *testing.T) {
     name      string
     request   string
     expected  string
-  } {
+  }{
     {
       name: "HelloWorld(Sandy)",
       request: "Sandy",
       expected: "Hello Sandy",
     },
+    {
+			name: "HelloWorld(Dwi)",
+			request: "Dwi",
+			expected: "Hello Dwi",
+		},
   }
 
   for _, test := range tests {
@@ -268,5 +273,105 @@ func TestHelloWorldTable(t *testing.T) {
       assert.Equal(t, test.expected, result)
     })
   }
+}
+```
+
+# Mock
+- Mock adalah object yang sudah kita program dengan ekspektasi tertentu sehingga ketika dipanggil, dia akan menghasilkan data yang sudah kita program diawal.
+- Mock adalah salah satu teknik dalam unit testing, dimana kita bisa membuat mock object dari suatu object yang memang sulit untuk di testing.
+- Misal kita ingin membuat unit test, namun ternyata ada kode program kita yang harus memanggil API Call ke third party service. Hal ini sangat sulit untuk di test, karena unit testing kita harus selalu memanggil third party service, dan belum tentu response-nya sesuai dengan apa yang kita mau.
+- Pada kasus seperti ini, cocok sekali untuk menggunakan mock object.
+
+## Testify Mock
+- Untuk membuat mock object, tidak ada fitur bawaan Go-Lang, namun kita bisa menggunakan library testify yang sebelumnya kita gunakan untuk assertion.
+- Testify mendukung pembuatan mock object, sehingga cocok untuk kita gunakan ketika ingin membuat mock object.
+- Namun, perlu diperhatikan, jika desain kode program kita jelek, akan sulit untuk melakukan mocking, jadi pastikan kita melakukan pembuatan desain kode program kita dengan baik.
+- Mari kita buat contoh kasus.
+
+## Aplikasi Query ke Database
+- Kita akan coba contoh kasus dengan membuat contoh aplikasi golang yang melakukan query ke database.
+- Dimana kita akan buat layer service sebagai business logic, dan layer repository sebagai jembatan ke database.
+- Agar kode kita mudah untuk di test, disarankan agar membuat kontrak berupa interface.
+
+## Kode Program Category Entity
+```go
+type Category struct {
+  Id string
+  Name string
+}
+```
+
+# Kode Program Category Repository
+```go
+import "belajar-golang-unit-test/entity"
+
+type CategoryRepository interface {
+  FindById(id string) *entity.Category
+}
+```
+
+# Kode Program Category Service
+```go
+type CategoryService struct {
+  Repository repository.CategoryRepository
+}
+
+func (service CategoryService) Get(id string) (*entity.Category, error) {
+  category := service.Repository.FindById(id)
+
+  if category == nil {
+    return category, errors.New("Category not found")
+  } else {
+    return category, nil
+  }
+}
+```
+
+# Kode Program Category Repository Mock
+```go
+type CategoryRepositoryMock struct {
+  Mock mock.Mock
+}
+
+func (repository *CategoryRepositoryMock) FindById(id string) *entity.Category {
+  arguments := repository.Mock.Called(id)
+
+  if arguments.Get(0) == nil {
+    return nil
+  }
+
+  category := arguments.Get(0).(entity.Category)
+  return &category
+}
+```
+
+# Kode Program Category Service Unit Test (1)
+```go
+var categoryRepository = &repository.CategoryRepositoryMock{Mock: mock.Mock{}}
+var categoryService = CategoryService{Repository: categoryRepository}
+
+func TestCategoryService_GetNotFound(t *testing.T) {
+  categoryRepository.Mock.On("FindById", "1").Return(nil)
+  category, err := categoryService.Get("1")
+  assert.NotNil(t, err)
+  assert.Nil(t, category)
+}
+``` 
+
+# Kode Program Category Service Unit Test (2)
+```go
+func TestCategoryService_GetFound(t *testing.T) {
+  category := entity.Category{
+    Id: "2",
+    Name: "Handphone",
+  }
+
+  categoryRepository.Mock.On("FindById", "2").Return(category)
+
+  result, err := categoryService.Get("2")
+  assert.Nil(t, err)
+  assert.NotNil(t, result)
+  assert.Equal(t, category.Id, result.Id)
+  assert.Equal(t, category.Name, result.Name)
 }
 ```
