@@ -239,3 +239,34 @@ func TestSubTest(t *testing.T) {
 - Kita sudah tahu jika ingin menjalankan sebuah unit test function, kita bisa gunakan perintah: ```go test -run TestNamaFunction```.
 - Jika kita ingin menjalankan hanya salah satu sub test, kita bisa gunakan perintah: ```go test -run TestNamaFunction/NamaSubTest```.
 - Atau untuk semua sub test di semua function, kita bisa gunakan perintah: ```go test -run /NamaSubTest```.
+
+# Table Test
+- Sebelumnya kita sudah belajar tentang sub test.
+- Jika diperhatikan, sebenarnya dengan sub test, kita bisa membuat test secara dinamis.
+- Dan fitur sub test ini biasa digunakan oleh programmer Go-Lang untuk membuat test dengan konsep table test.
+- Table test yaitu dimana kita menyediakan data berupa slice yang berisi parameter dan ekspektasi hasil dari unit test.
+- Lalu slice tersebut kita iterasi menggunakan sub test.
+
+## Kode Program Table Test
+```go
+func TestHelloWorldTable(t *testing.T) {
+  tests := []struct{
+    name      string
+    request   string
+    expected  string
+  } {
+    {
+      name: "HelloWorld(Sandy)",
+      request: "Sandy",
+      expected: "Hello Sandy",
+    },
+  }
+
+  for _, test := range tests {
+    t.Run(test.name, func(t *testing.T) {
+      result := HelloWorld(test.request)
+      assert.Equal(t, test.expected, result)
+    })
+  }
+}
+```
