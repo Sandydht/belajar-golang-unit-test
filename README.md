@@ -234,3 +234,8 @@ func TestSubTest(t *testing.T) {
   })
 }
 ```
+
+## Menjalankan Hanya Sub Test
+- Kita sudah tahu jika ingin menjalankan sebuah unit test function, kita bisa gunakan perintah: ```go test -run TestNamaFunction```.
+- Jika kita ingin menjalankan hanya salah satu sub test, kita bisa gunakan perintah: ```go test -run TestNamaFunction/NamaSubTest```.
+- Atau untuk semua sub test di semua function, kita bisa gunakan perintah: ```go test -run /NamaSubTest```.
